@@ -2,51 +2,65 @@ const express = require('express');
 const fetch = require('node-fetch');
 const compression = require('compression');
 const helmet = require('helmet');
-const path = require('path');
+const LRU = require('lru-cache');
 
 const app = express();
 
-// Middlewares de segurança e performance
+// Cache LRU ultra rápido
+const cache = new LRU({
+  max: 100,
+  ttl: 1000 * 60 * 5, // 5 minutos
+  updateAgeOnGet: true
+});
+
+// Middlewares de performance máxima
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false
 }));
-app.use(compression());
-app.use(express.static('public'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(compression({ level: 9 })); // Compressão máxima
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Configurações protegidas
+// Headers de performance
+app.use((req, res, next) => {
+  res.setHeader('X-Powered-By', 'Stream+');
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  res.setHeader('Vary', 'Accept-Encoding');
+  next();
+});
+
+// Configurações
 const CONFIG = {
   TMDB_API_KEY: 'b73f5479e8443355e40462afe494fc52',
   PLAYER_URL_MOVIE: 'https://playerflixapi.com/filme/',
-  PLAYER_URL_TV: 'https://playerflixapi.com/serie/',
-  SUGGESTIONS_EMAIL: 'simitochicuava@gmail.com',
-  APP_DOWNLOAD_LINK: 'https://baixarflixmoz.netlify.app/'
+  PLAYER_URL_TV: 'https://playerflixapi.com/serie/'
 };
 
-// Cache para melhor performance
-let cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
-
-// Função para buscar dados com cache
-async function fetchWithCache(url, key) {
+// Função de fetch com cache e timeout
+async function fetchWithCache(url, key, timeout = 5000) {
   const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data;
-  }
+  if (cached) return cached;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) throw new Error('API não respondeu');
+    
     const data = await response.json();
-    cache.set(key, { data, timestamp: Date.now() });
+    cache.set(key, data);
     return data;
   } catch (error) {
-    throw new Error('Falha ao obter dados');
+    clearTimeout(timeoutId);
+    throw new Error(`Falha na requisição: ${error.message}`);
   }
 }
 
-// Rotas da API protegidas
+// API Routes otimizadas
 app.get('/api/:type', async (req, res) => {
   try {
     const { type } = req.params;
@@ -70,6 +84,9 @@ app.get('/api/:type', async (req, res) => {
         url = `${baseUrl}discover/tv?api_key=${CONFIG.TMDB_API_KEY}&language=${lang}&with_genres=16&sort_by=popularity.desc&page=${page}`;
         break;
       case 'search':
+        if (!query || query.length < 2) {
+          return res.json({ results: [] });
+        }
         url = `${baseUrl}search/multi?api_key=${CONFIG.TMDB_API_KEY}&language=${lang}&query=${encodeURIComponent(query)}&page=${page}`;
         break;
       case 'details':
@@ -78,21 +95,12 @@ app.get('/api/:type', async (req, res) => {
       case 'credits':
         url = `${baseUrl}${media_type}/${id}/credits?api_key=${CONFIG.TMDB_API_KEY}&language=${lang}`;
         break;
-      case 'recommendations':
-        url = `${baseUrl}${media_type}/${id}/recommendations?api_key=${CONFIG.TMDB_API_KEY}&language=${lang}&page=1`;
-        break;
-      case 'person':
-        url = `${baseUrl}person/${id}?api_key=${CONFIG.TMDB_API_KEY}&language=${lang}`;
-        break;
-      case 'person_credits':
-        url = `${baseUrl}person/${id}/combined_credits?api_key=${CONFIG.TMDB_API_KEY}&language=${lang}`;
-        break;
       default:
-        return res.status(400).json({ error: 'Tipo de API inválido' });
+        return res.status(400).json({ error: 'Tipo inválido' });
     }
 
     const cacheKey = `${type}-${JSON.stringify(req.query)}`;
-    const data = await fetchWithCache(url, cacheKey);
+    const data = await fetchWithCache(url, cacheKey, 3000);
     
     res.json(data);
   } catch (error) {
@@ -100,12 +108,12 @@ app.get('/api/:type', async (req, res) => {
   }
 });
 
-// Rota do player protegida
+// Rota do player otimizada
 app.get('/api/player', async (req, res) => {
   try {
     const { id, type } = req.query;
     
-    if (!id || !type || !['movie', 'tv'].includes(type)) {
+    if (!id || !type) {
       return res.status(400).json({ error: 'Parâmetros inválidos' });
     }
 
@@ -113,983 +121,364 @@ app.get('/api/player', async (req, res) => {
       ? `${CONFIG.PLAYER_URL_MOVIE}${id}`
       : `${CONFIG.PLAYER_URL_TV}${id}`;
 
-    // Log de acesso para monitoramento
-    console.log(`Player accessed: ID=${id}, Type=${type}, IP=${req.ip}`);
-    
     res.json({ url });
   } catch (error) {
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    res.status(500).json({ error: 'Erro interno' });
   }
 });
 
-// Rota principal
-app.get('*', (req, res) => {
-  const html = `
+// HTML otimizado com pré-carregamento
+const optimizedHTML = `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Stream+ - A Melhor Plataforma de Streaming</title>
-  <meta name="description" content="Stream+ é a plataforma de streaming definitiva com filmes, séries e animes. Assista onde e quando quiser!">
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://stream-plus.vercel.app/" />
-  <meta name="theme-color" content="#E50914">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="/icons/icon-192.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="icon" type="image/png" href="/icons/icon-512.png" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stream+ - Streaming Ultra Rápido</title>
+  <meta name="description" content="Stream+ - A plataforma de streaming mais rápida do mercado">
+  
+  <!-- Pré-carregamento crítico -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://image.tmdb.org">
+  
+  <!-- CSS Inline Crítico -->
   <style>
-    :root {
-      --primary-red: #e50914;
-      --primary-dark: #141414;
-      --darker: #0a0a0a;
-      --light: #f5f5f1;
-      --gray: #808080;
-      --card-bg: #181818;
-      --header-height: 68px;
-      --bottom-nav-height: 60px;
-      --banner-height: 50px;
-      --card-radius: 8px;
-      --transition: all 0.3s ease;
-      --shadow: 0 8px 16px rgba(0,0,0,0.5);
-      --hover-scale: 1.05;
-      --hover-translate: -5px;
-      --gradient: linear-gradient(135deg, #e50914 0%, #b81d24 100%);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Roboto', 'Arial', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: var(--primary-dark);
-      color: var(--light);
-      overflow-x: hidden;
-      min-height: 100vh;
-      padding-bottom: calc(var(--bottom-nav-height) + var(--banner-height));
-      font-size: 16px;
-    }
-
-    /* Header Moderno */
-    header {
-      padding: 0 4%;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.9) 10%, transparent 90%);
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: var(--header-height);
-      transition: var(--transition);
-      backdrop-filter: blur(10px);
-    }
-
-    .logo {
-      color: var(--primary-red);
-      font-size: 2.2rem;
-      font-weight: 900;
-      text-decoration: none;
-      letter-spacing: -1px;
-      text-shadow: var(--shadow);
-      background: var(--gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .search-btn, .menu-btn {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-      backdrop-filter: blur(10px);
-    }
-
-    .search-btn:hover, .menu-btn:hover {
-      background: var(--primary-red);
-      transform: scale(1.1);
-    }
-
-    /* Hero Section Aprimorada */
-    .hero {
-      height: 85vh;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      margin-top: var(--header-height);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to right, rgba(20,20,20,0.9) 0%, transparent 50%, rgba(20,20,20,0.3) 100%);
-    }
-
-    .hero-content {
-      padding: 4%;
-      z-index: 1;
-      width: 100%;
-      max-width: 700px;
-    }
-
-    .hero-title {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      font-weight: 900;
-      text-shadow: var(--shadow);
-      line-height: 1.1;
-      background: linear-gradient(45deg, #fff, #e50914);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-desc {
-      font-size: 1.3rem;
-      margin-bottom: 25px;
-      max-width: 600px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-      line-height: 1.5;
-      color: #e6e6e6;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 15px;
-      margin-top: 25px;
-    }
-
-    .hero-btn {
-      padding: 15px 35px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 1.1rem;
-      transition: var(--transition);
-      box-shadow: var(--shadow);
-    }
-
-    .btn-play {
-      background: var(--gradient);
-      color: white;
-    }
-
-    .btn-play:hover {
-      transform: scale(1.05);
-      box-shadow: 0 12px 20px rgba(229, 9, 20, 0.3);
-    }
-
-    .btn-info {
-      background: rgba(255,255,255,0.2);
-      color: white;
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-info:hover {
-      background: rgba(255,255,255,0.3);
-      transform: scale(1.05);
-    }
-
-    /* Categorias Modernas */
-    .categories {
-      padding: 40px 0;
-      position: relative;
-      z-index: 10;
-    }
-
-    .section-title {
-      font-size: 1.8rem;
-      margin: 0 4% 25px;
-      font-weight: 700;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 2px;
-      background: var(--gradient);
-      margin-left: 10px;
-    }
-
-    .carousel {
-      display: flex;
-      overflow-x: auto;
-      gap: 20px;
-      padding: 0 4% 20px;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
-    }
-
-    .carousel::-webkit-scrollbar {
-      display: none;
-    }
-
-    .item {
-      min-width: 280px;
-      width: 280px;
-      cursor: pointer;
-      position: relative;
-      flex-shrink: 0;
-      border-radius: var(--card-radius);
-      overflow: hidden;
-      transition: var(--transition);
-      background: var(--card-bg);
-      box-shadow: var(--shadow);
-      transform-origin: center left;
-    }
-
-    .item:hover {
-      transform: scale(var(--hover-scale)) translateY(var(--hover-translate));
-      z-index: 2;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    .item-poster {
-      width: 100%;
-      height: 400px;
-      object-fit: cover;
-      display: block;
-      transition: var(--transition);
-    }
-
-    .item:hover .item-poster {
-      transform: scale(1.08);
-    }
-
-    .item-title {
-      padding: 20px 15px;
-      font-weight: 600;
-      text-align: center;
-      background: var(--card-bg);
-      transition: var(--transition);
-      font-size: 1rem;
-    }
-
-    /* Grid View Moderno */
-    .grid-view {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 25px;
-      padding: 0 4%;
-    }
-
-    .grid-item {
-      background: var(--card-bg);
-      border-radius: var(--card-radius);
-      overflow: hidden;
-      transition: var(--transition);
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      position: relative;
-      transform-origin: center center;
-    }
-
-    .grid-item:hover {
-      transform: scale(var(--hover-scale)) translateY(var(--hover-translate));
-      z-index: 2;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
-    }
-
-    .grid-poster {
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-      display: block;
-      transition: var(--transition);
-    }
-
-    .grid-item:hover .grid-poster {
-      transform: scale(1.08);
-    }
-
-    .grid-title {
-      padding: 20px 15px;
-      font-size: 1rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-      background: var(--card-bg);
-      transition: var(--transition);
-      font-weight: 600;
-    }
-
-    /* Player Modal Moderno */
-    .player-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.98);
-      z-index: 3000;
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .player-modal-content {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      height: 100%;
-    }
-
-    .player-modal-close {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 2rem;
-      color: white;
-      cursor: pointer;
-      z-index: 2;
-      background: rgba(229, 9, 20, 0.8);
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-      backdrop-filter: blur(10px);
-    }
-
-    .player-modal-close:hover {
-      background: var(--primary-red);
-      transform: rotate(90deg);
-    }
-
-    .player-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .video-player {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background-color: #000;
-    }
-
-    /* Bottom Navigation Moderna */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: var(--bottom-nav-height);
-      background: var(--darker);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 999;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--gray);
-      text-decoration: none;
-      font-size: 0.8rem;
-      transition: var(--transition);
-      padding: 8px 0;
-      width: 20%;
-    }
-
-    .nav-item i {
-      font-size: 1.4rem;
-      margin-bottom: 5px;
-      transition: var(--transition);
-    }
-
-    .nav-item.active, .nav-item:hover {
-      color: white;
-    }
-
-    .nav-item.active i {
-      color: var(--primary-red);
-    }
-
-    /* Loading Spinner Moderno */
-    .loading {
-      display: flex;
-      justify-content: center;
-      padding: 60px;
-    }
-
-    .spinner {
-      width: 60px;
-      height: 60px;
-      border: 4px solid rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      border-top-color: var(--primary-red);
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .hero-title {
-        font-size: 2.5rem;
-      }
-      .hero-desc {
-        font-size: 1.1rem;
-      }
-      .item {
-        min-width: 200px;
-        width: 200px;
-      }
-      .item-poster {
-        height: 300px;
-      }
-      .grid-view {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 15px;
-      }
-      .grid-poster {
-        height: 225px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .hero-title {
-        font-size: 2rem;
-      }
-      .hero-btn {
-        padding: 12px 25px;
-        font-size: 1rem;
-      }
-      .item {
-        min-width: 160px;
-        width: 160px;
-      }
-      .item-poster {
-        height: 240px;
-      }
-      .grid-view {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 12px;
-      }
-      .grid-poster {
-        height: 195px;
-      }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#141414;color:#fff;font-family:system-ui,-apple-system,sans-serif;overflow-x:hidden}
+    .loading{display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
+    .spinner{width:40px;height:40px;border:3px solid rgba(229,9,20,0.3);border-radius:50%;border-top-color:#e50914;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .logo{color:#e50914;font-size:2rem;font-weight:900;text-decoration:none}
+    .grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px;padding:20px}
+    .grid-item{background:#181818;border-radius:8px;overflow:hidden;transition:transform 0.2s}
+    .grid-item:hover{transform:scale(1.05)}
+    .grid-poster{width:100%;height:225px;object-fit:cover}
+    .grid-title{padding:10px;font-size:0.9rem;text-align:center}
+    .hero{height:70vh;background-size:cover;background-position:center;position:relative;display:flex;align-items:center;padding:0 4%}
+    .hero-content{max-width:600px;z-index:2}
+    .hero-title{font-size:3rem;margin-bottom:1rem;font-weight:900}
+    .hero-desc{font-size:1.1rem;margin-bottom:1.5rem;opacity:0.9}
+    .hero-btn{padding:12px 30px;border:none;border-radius:4px;font-weight:700;cursor:pointer;margin-right:1rem;transition:all 0.2s}
+    .btn-play{background:#e50914;color:white}
+    .btn-play:hover{background:#f40612}
+    .carousel{display:flex;overflow-x:auto;gap:15px;padding:20px;scrollbar-width:none}
+    .carousel::-webkit-scrollbar{display:none}
+    .item{min-width:200px;flex-shrink:0;background:#181818;border-radius:8px;overflow:hidden}
+    .item-poster{width:100%;height:300px;object-fit:cover}
+    @media (max-width:768px){
+      .hero-title{font-size:2rem}
+      .grid-view{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+      .grid-poster{height:180px}
     }
   </style>
 </head>
 <body>
-  <!-- Header Moderno -->
-  <header id="main-header">
+  <header style="padding:1rem 4%;background:rgba(0,0,0,0.9);position:fixed;top:0;width:100%;z-index:1000;display:flex;justify-content:space-between;align-items:center">
     <a href="/" class="logo">STREAM+</a>
-    <div class="header-right">
-      <button class="search-btn" id="search-btn">
+    <div>
+      <button onclick="location.href='/search'" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;margin-left:1rem">
         <i class="fas fa-search"></i>
-      </button>
-      <button class="menu-btn" id="menu-btn">
-        <i class="fas fa-user"></i>
       </button>
     </div>
   </header>
 
-  <!-- Conteúdo Dinâmico -->
-  <div id="app">
+  <main id="app" style="margin-top:80px">
     <div class="loading">
       <div class="spinner"></div>
+      <p style="margin-top:1rem">Carregando Stream+...</p>
     </div>
+  </main>
+
+  <div class="player-modal" id="player-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:2000">
+    <button onclick="closePlayer()" style="position:absolute;top:20px;right:20px;background:#e50914;color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:2001">×</button>
+    <iframe id="video-player" style="width:100%;height:100%;border:none" allowfullscreen></iframe>
   </div>
 
-  <!-- Player Modal -->
-  <div class="player-modal" id="player-modal">
-    <div class="player-modal-content">
-      <div class="player-modal-close" id="player-modal-close">
-        <i class="fas fa-times"></i>
-      </div>
-      <div class="player-container">
-        <div class="player-loading" id="player-loading">
-          <div class="spinner"></div>
-          <p>Carregando conteúdo premium...</p>
-        </div>
-        <iframe class="video-player" id="video-player" allowfullscreen></iframe>
-      </div>
-    </div>
-  </div>
+  <nav style="position:fixed;bottom:0;width:100%;background:#0a0a0a;display:flex;justify-content:space-around;padding:1rem 0;border-top:1px solid #333">
+    <a href="/" style="color:#e50914;text-decoration:none;text-align:center">
+      <i class="fas fa-home"></i><br><span style="font-size:0.8rem">Início</span>
+    </a>
+    <a href="/movies" style="color:white;text-decoration:none;text-align:center">
+      <i class="fas fa-film"></i><br><span style="font-size:0.8rem">Filmes</span>
+    </a>
+    <a href="/tv" style="color:white;text-decoration:none;text-align:center">
+      <i class="fas fa-tv"></i><br><span style="font-size:0.8rem">Séries</span>
+    </a>
+    <a href="/anime" style="color:white;text-decoration:none;text-align:center">
+      <i class="fas fa-dragon"></i><br><span style="font-size:0.8rem">Animes</span>
+    </a>
+  </nav>
 
-  <!-- Bottom Navigation -->
-  <div class="bottom-nav">
-    <a href="/" class="nav-item active">
-      <i class="fas fa-home"></i>
-      <span>Início</span>
-    </a>
-    <a href="/movies" class="nav-item">
-      <i class="fas fa-film"></i>
-      <span>Filmes</span>
-    </a>
-    <a href="/tv" class="nav-item">
-      <i class="fas fa-tv"></i>
-      <span>Séries</span>
-    </a>
-    <a href="/anime" class="nav-item">
-      <i class="fas fa-dragon"></i>
-      <span>Animes</span>
-    </a>
-    <a href="/favorites" class="nav-item">
-      <i class="fas fa-heart"></i>
-      <span>Favoritos</span>
-    </a>
-  </div>
-
+  <!-- Scripts não críticos carregados async -->
   <script>
+    // App principal otimizado
     class StreamPlus {
       constructor() {
-        this.currentPage = this.getCurrentPage();
+        this.cache = new Map();
         this.init();
-      }
-
-      getCurrentPage() {
-        const path = window.location.pathname;
-        if (path === '/movies') return 'movies';
-        if (path === '/tv') return 'tv';
-        if (path === '/anime') return 'anime';
-        if (path === '/favorites') return 'favorites';
-        if (path === '/search') return 'search';
-        return 'home';
       }
 
       async init() {
         await this.loadPage();
-        this.setupEventListeners();
+        this.loadNonCriticalCSS();
       }
 
       async loadPage() {
+        const path = window.location.pathname;
         const app = document.getElementById('app');
         
-        switch(this.currentPage) {
-          case 'home':
-            app.innerHTML = this.getHomeHTML();
-            await this.loadHomeContent();
-            break;
-          case 'movies':
-            app.innerHTML = this.getMoviesHTML();
-            await this.loadMovies();
-            break;
-          case 'tv':
-            app.innerHTML = this.getTVHTML();
-            await this.loadTV();
-            break;
-          case 'anime':
-            app.innerHTML = this.getAnimeHTML();
-            await this.loadAnime();
-            break;
-          case 'favorites':
-            app.innerHTML = this.getFavoritesHTML();
-            await this.loadFavorites();
-            break;
-          case 'search':
-            app.innerHTML = this.getSearchHTML();
-            this.setupSearch();
-            break;
-        }
-      }
-
-      getHomeHTML() {
-        return \`
-          <section class="hero" id="hero">
-            <div class="hero-content">
-              <h1 class="hero-title" id="hero-title">Carregando...</h1>
-              <p class="hero-desc" id="hero-desc"></p>
-              <div class="hero-actions">
-                <button class="hero-btn btn-play" id="hero-play">
-                  <i class="fas fa-play"></i> Reproduzir
-                </button>
-                <button class="hero-btn btn-info" id="hero-info">
-                  <i class="fas fa-info-circle"></i> Mais Informações
-                </button>
-              </div>
-            </div>
-          </section>
-          <section class="categories">
-            <div id="categories-container"></div>
-          </section>
-        \`;
-      }
-
-      getMoviesHTML() {
-        return \`
-          <div class="search-page">
-            <div class="search-header">
-              <h1><i class="fas fa-film"></i> Filmes Populares</h1>
-            </div>
-            <div class="grid-view" id="movies-container"></div>
-            <div class="loading" id="movies-loading">
-              <div class="spinner"></div>
-            </div>
-          </div>
-        \`;
-      }
-
-      getTVHTML() {
-        return \`
-          <div class="search-page">
-            <div class="search-header">
-              <h1><i class="fas fa-tv"></i> Séries Populares</h1>
-            </div>
-            <div class="grid-view" id="tv-container"></div>
-            <div class="loading" id="tv-loading">
-              <div class="spinner"></div>
-            </div>
-          </div>
-        \`;
-      }
-
-      getAnimeHTML() {
-        return \`
-          <div class="search-page">
-            <div class="search-header">
-              <h1><i class="fas fa-dragon"></i> Animes</h1>
-            </div>
-            <div class="grid-view" id="anime-container"></div>
-            <div class="loading" id="anime-loading">
-              <div class="spinner"></div>
-            </div>
-          </div>
-        \`;
-      }
-
-      getFavoritesHTML() {
-        return \`
-          <div class="search-page">
-            <div class="search-header">
-              <h1><i class="fas fa-heart"></i> Minha Lista</h1>
-            </div>
-            <div class="grid-view" id="favorites-container"></div>
-          </div>
-        \`;
-      }
-
-      getSearchHTML() {
-        return \`
-          <div class="search-page">
-            <div class="search-header">
-              <h1><i class="fas fa-search"></i> Pesquisar</h1>
-              <input type="text" class="search-input" placeholder="Pesquisar filmes, séries..." id="search-input">
-            </div>
-            <div class="grid-view" id="search-results"></div>
-            <div class="loading" id="search-loading">
-              <div class="spinner"></div>
-            </div>
-          </div>
-        \`;
-      }
-
-      async loadHomeContent() {
         try {
-          // Carregar banner hero
-          const heroData = await this.fetchAPI('hero');
-          const randomMedia = heroData.results[Math.floor(Math.random() * heroData.results.length)];
-          
-          document.getElementById('hero-title').textContent = randomMedia.title || randomMedia.name;
-          document.getElementById('hero-desc').textContent = this.truncateText(randomMedia.overview, 150);
-          document.getElementById('hero').style.backgroundImage = \`url(https://image.tmdb.org/t/p/original\${randomMedia.backdrop_path})\`;
-
-          // Configurar botões do hero
-          document.getElementById('hero-play').onclick = () => this.openPlayer(randomMedia.id, randomMedia.media_type || 'movie');
-          document.getElementById('hero-info').onclick = () => this.openDetails(randomMedia.id, randomMedia.media_type || 'movie');
-
-          // Carregar categorias
-          await this.loadCategories();
+          if (path === '/movies') {
+            await this.loadSection('movies', 'Filmes Populares');
+          } else if (path === '/tv') {
+            await this.loadSection('tv', 'Séries Populares');
+          } else if (path === '/anime') {
+            await this.loadSection('anime', 'Animes');
+          } else if (path === '/search') {
+            this.loadSearch();
+          } else {
+            await this.loadHome();
+          }
         } catch (error) {
-          console.error('Erro ao carregar conteúdo inicial:', error);
+          app.innerHTML = '<div style="padding:2rem;text-align:center"><p>Erro ao carregar. Tente recarregar a página.</p></div>';
         }
       }
 
-      async loadCategories() {
-        const categories = [
-          { title: 'Em Alta', type: 'hero' },
-          { title: 'Filmes Populares', type: 'movies' },
-          { title: 'Séries Populares', type: 'tv' },
-          { title: 'Animes', type: 'anime' }
-        ];
-
-        const container = document.getElementById('categories-container');
+      async loadHome() {
+        const app = document.getElementById('app');
         
-        for (const category of categories) {
-          try {
-            const data = await this.fetchAPI(category.type);
-            const html = \`
-              <div class="category">
-                <h2 class="section-title">\${category.title}</h2>
-                <div class="carousel">
-                  \${data.results.slice(0, 10).map(item => this.createMediaItem(item)).join('')}
+        try {
+          // Carregar banner principal primeiro
+          const [heroData, moviesData, tvData] = await Promise.all([
+            this.fetchAPI('hero'),
+            this.fetchAPI('movies', { page: 1 }),
+            this.fetchAPI('tv', { page: 1 })
+          ]);
+
+          const heroMedia = heroData.results[0];
+          app.innerHTML = \`
+            <section class="hero" style="background-image:url(https://image.tmdb.org/t/p/original\${heroMedia.backdrop_path})">
+              <div class="hero-content">
+                <h1 class="hero-title">\${heroMedia.title || heroMedia.name}</h1>
+                <p class="hero-desc">\${this.truncateText(heroMedia.overview, 150)}</p>
+                <div>
+                  <button class="hero-btn btn-play" onclick="app.openPlayer(\${heroMedia.id}, '\${heroMedia.media_type || 'movie'}')">
+                    <i class="fas fa-play"></i> Assistir
+                  </button>
+                  <button class="hero-btn" style="background:rgba(255,255,255,0.2);color:white" onclick="app.openDetails(\${heroMedia.id}, '\${heroMedia.media_type || 'movie'}')">
+                    <i class="fas fa-info-circle"></i> Detalhes
+                  </button>
                 </div>
               </div>
-            \`;
-            container.innerHTML += html;
-          } catch (error) {
-            console.error(\`Erro ao carregar categoria \${category.title}:\`, error);
-          }
-        }
+            </section>
 
-        // Adicionar event listeners
-        this.setupMediaItemListeners();
+            <section>
+              <h2 style="padding:0 4%;margin:2rem 0 1rem 0">Filmes Populares</h2>
+              <div class="carousel" id="movies-carousel">
+                \${moviesData.results.slice(0,10).map(item => this.createCarouselItem(item)).join('')}
+              </div>
+            </section>
+
+            <section>
+              <h2 style="padding:0 4%;margin:2rem 0 1rem 0">Séries Populares</h2>
+              <div class="carousel" id="tv-carousel">
+                \${tvData.results.slice(0,10).map(item => this.createCarouselItem(item)).join('')}
+              </div>
+            </section>
+          \`;
+
+          this.attachEventListeners();
+        } catch (error) {
+          console.error('Erro home:', error);
+        }
       }
 
-      createMediaItem(item) {
-        const title = item.title || item.name;
-        const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
-        const posterUrl = item.poster_path 
-          ? \`https://image.tmdb.org/t/p/w500\${item.poster_path}\`
-          : 'https://via.placeholder.com/500x750?text=Stream+';
+      async loadSection(type, title) {
+        const app = document.getElementById('app');
+        
+        try {
+          const data = await this.fetchAPI(type, { page: 1 });
+          app.innerHTML = \`
+            <h1 style="padding:2rem 4% 1rem">\${title}</h1>
+            <div class="grid-view">
+              \${data.results.map(item => this.createGridItem(item)).join('')}
+            </div>
+          \`;
+          
+          this.attachEventListeners();
+        } catch (error) {
+          console.error(\`Erro \${type}:\`, error);
+        }
+      }
 
+      createCarouselItem(item) {
+        const title = item.title || item.name;
+        const type = item.media_type || (item.title ? 'movie' : 'tv');
+        const poster = item.poster_path ? \`https://image.tmdb.org/t/p/w500\${item.poster_path}\` : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9Ijc1MCIgdmlld0JveD0iMCAwIDUwMCA3NTAiIGZpbGw9IiMxODE4MTgiPjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNzUwIi8+PHRleHQgeD0iMjUwIiB5PSIzNzUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U3RyZWFtKzwvdGV4dD48L3N2Zz4=';
+        
         return \`
-          <div class="item" data-id="\${item.id}" data-type="\${mediaType}">
-            <img src="\${posterUrl}" alt="\${title}" class="item-poster" loading="lazy">
-            <div class="item-title">\${title}</div>
+          <div class="item" onclick="app.openDetails(\${item.id}, '\${type}')">
+            <img src="\${poster}" alt="\${title}" class="item-poster" loading="lazy">
           </div>
         \`;
       }
 
       createGridItem(item) {
         const title = item.title || item.name;
-        const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
-        const posterUrl = item.poster_path 
-          ? \`https://image.tmdb.org/t/p/w500\${item.poster_path}\`
-          : 'https://via.placeholder.com/500x750?text=Stream+';
-
+        const type = item.media_type || (item.title ? 'movie' : 'tv');
+        const poster = item.poster_path ? \`https://image.tmdb.org/t/p/w500\${item.poster_path}\` : 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9Ijc1MCIgdmlld0JveD0iMCAwIDUwMCA3NTAiIGZpbGw9IiMxODE4MTgiPjxyZWN0IHdpZHRoPSI1MDAiIGhlaWdodD0iNzUwIi8+PHRleHQgeD0iMjUwIiB5PSIzNzUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U3RyZWFtKzwvdGV4dD48L3N2Zz4=';
+        
         return \`
-          <div class="grid-item" data-id="\${item.id}" data-type="\${mediaType}">
-            <img src="\${posterUrl}" alt="\${title}" class="grid-poster" loading="lazy">
+          <div class="grid-item" onclick="app.openDetails(\${item.id}, '\${type}')">
+            <img src="\${poster}" alt="\${title}" class="grid-poster" loading="lazy">
             <div class="grid-title">\${title}</div>
           </div>
         \`;
       }
 
-      setupMediaItemListeners() {
-        document.querySelectorAll('.item, .grid-item').forEach(item => {
-          item.addEventListener('click', () => {
-            const id = item.dataset.id;
-            const type = item.dataset.type;
-            this.openDetails(id, type);
-          });
-        });
+      attachEventListeners() {
+        // Event listeners são adicionados via onclick nos elementos
       }
 
-      async openDetails(id, type) {
-        // Implementar página de detalhes
-        alert(\`Detalhes: ID \${id}, Tipo: \${type}\`);
+      async fetchAPI(endpoint, params = {}) {
+        const cacheKey = \`\${endpoint}-\${JSON.stringify(params)}\`;
+        if (this.cache.has(cacheKey)) {
+          return this.cache.get(cacheKey);
+        }
+
+        const query = new URLSearchParams(params).toString();
+        const url = \`/api/\${endpoint}\${query ? '?' + query : ''}\`;
+        
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('API error');
+        
+        const data = await response.json();
+        this.cache.set(cacheKey, data);
+        return data;
       }
 
       async openPlayer(id, type) {
         try {
-          const playerModal = document.getElementById('player-modal');
-          const playerLoading = document.getElementById('player-loading');
-          const videoPlayer = document.getElementById('video-player');
-
-          playerModal.style.display = 'flex';
-          playerLoading.style.display = 'flex';
-          videoPlayer.style.display = 'none';
-
+          const modal = document.getElementById('player-modal');
+          const iframe = document.getElementById('video-player');
+          
+          modal.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          
           const response = await fetch(\`/api/player?id=\${id}&type=\${type}\`);
           const data = await response.json();
-
+          
           if (data.url) {
-            videoPlayer.src = data.url;
-            videoPlayer.style.display = 'block';
-            playerLoading.style.display = 'none';
+            iframe.src = data.url;
           } else {
-            throw new Error('URL do player não encontrada');
+            throw new Error('URL não encontrada');
           }
         } catch (error) {
-          console.error('Erro ao abrir player:', error);
-          alert('Erro ao carregar o player. Tente novamente.');
+          alert('Erro ao carregar player');
           this.closePlayer();
         }
       }
 
       closePlayer() {
-        const playerModal = document.getElementById('player-modal');
-        const videoPlayer = document.getElementById('video-player');
+        const modal = document.getElementById('player-modal');
+        const iframe = document.getElementById('video-player');
         
-        playerModal.style.display = 'none';
-        videoPlayer.src = '';
+        modal.style.display = 'none';
+        iframe.src = '';
+        document.body.style.overflow = 'auto';
       }
 
-      setupEventListeners() {
-        // Fechar player
-        document.getElementById('player-modal-close').addEventListener('click', () => this.closePlayer());
-
-        // Busca
-        document.getElementById('search-btn').addEventListener('click', () => {
-          window.location.href = '/search';
-        });
-
-        // Navigation
-        document.querySelectorAll('.nav-item').forEach(item => {
-          item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const href = item.getAttribute('href');
-            window.location.href = href;
-          });
-        });
+      openDetails(id, type) {
+        // Implementação simplificada - pode ser expandida
+        this.openPlayer(id, type);
       }
 
-      async fetchAPI(endpoint, params = {}) {
-        const queryString = new URLSearchParams(params).toString();
-        const url = \`/api/\${endpoint}\${queryString ? '?' + queryString : ''}\`;
-        
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Falha na requisição API');
-        return await response.json();
-      }
+      loadSearch() {
+        const app = document.getElementById('app');
+        app.innerHTML = \`
+          <div style="padding:2rem 4%">
+            <h1>Pesquisar</h1>
+            <input type="text" id="search-input" placeholder="Digite para pesquisar..." 
+                   style="width:100%;padding:1rem;margin:1rem 0;background:#333;border:none;border-radius:4px;color:white;font-size:1rem">
+            <div class="grid-view" id="search-results"></div>
+          </div>
+        \`;
 
-      truncateText(text, length) {
-        return text && text.length > length ? text.substring(0, length) + '...' : text;
-      }
-
-      // Métodos para carregar conteúdo específico das páginas
-      async loadMovies() {
-        try {
-          const data = await this.fetchAPI('movies');
-          const container = document.getElementById('movies-container');
-          container.innerHTML = data.results.map(item => this.createGridItem(item)).join('');
-          this.setupMediaItemListeners();
-        } catch (error) {
-          console.error('Erro ao carregar filmes:', error);
-        }
-      }
-
-      async loadTV() {
-        try {
-          const data = await this.fetchAPI('tv');
-          const container = document.getElementById('tv-container');
-          container.innerHTML = data.results.map(item => this.createGridItem(item)).join('');
-          this.setupMediaItemListeners();
-        } catch (error) {
-          console.error('Erro ao carregar séries:', error);
-        }
-      }
-
-      async loadAnime() {
-        try {
-          const data = await this.fetchAPI('anime');
-          const container = document.getElementById('anime-container');
-          container.innerHTML = data.results.map(item => this.createGridItem(item)).join('');
-          this.setupMediaItemListeners();
-        } catch (error) {
-          console.error('Erro ao carregar animes:', error);
-        }
-      }
-
-      async loadFavorites() {
-        // Implementar carregamento de favoritos do localStorage
-        const container = document.getElementById('favorites-container');
-        container.innerHTML = '<p style="text-align: center; padding: 40px;">Sua lista de favoritos aparecerá aqui</p>';
+        this.setupSearch();
       }
 
       setupSearch() {
-        const searchInput = document.getElementById('search-input');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', (e) => {
-          clearTimeout(searchTimeout);
+        const input = document.getElementById('search-input');
+        let timeout;
+        
+        input.addEventListener('input', (e) => {
+          clearTimeout(timeout);
           const query = e.target.value.trim();
           
           if (query.length < 2) {
             document.getElementById('search-results').innerHTML = '';
             return;
           }
-
-          searchTimeout = setTimeout(async () => {
+          
+          timeout = setTimeout(async () => {
             try {
-              document.getElementById('search-loading').style.display = 'flex';
               const data = await this.fetchAPI('search', { query });
-              const container = document.getElementById('search-results');
-              container.innerHTML = data.results
+              const results = document.getElementById('search-results');
+              results.innerHTML = data.results
                 .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
                 .map(item => this.createGridItem(item)).join('');
-              this.setupMediaItemListeners();
             } catch (error) {
-              console.error('Erro na busca:', error);
-            } finally {
-              document.getElementById('search-loading').style.display = 'none';
+              console.error('Search error:', error);
             }
-          }, 500);
+          }, 300);
         });
+      }
+
+      truncateText(text, length) {
+        return text && text.length > length ? text.substr(0, length) + '...' : text;
+      }
+
+      loadNonCriticalCSS() {
+        // Carrega Font Awesome async
+        const fa = document.createElement('link');
+        fa.rel = 'stylesheet';
+        fa.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(fa);
+
+        // Carrega Google Fonts async
+        const font = document.createElement('link');
+        font.rel = 'stylesheet';
+        font.href = 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap';
+        document.head.appendChild(font);
       }
     }
 
-    // Inicializar aplicação
-    document.addEventListener('DOMContentLoaded', () => {
-      new StreamPlus();
-    });
+    // Inicialização rápida
+    const app = new StreamPlus();
+    window.app = app;
+    window.closePlayer = () => app.closePlayer();
+
+    // Service Worker para cache (opcional)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(console.error);
+    }
   </script>
 </body>
 </html>
-  `;
+`;
+
+// Rota principal otimizada
+app.get('*', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  res.send(optimizedHTML);
 });
 
-// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Stream+ rodando na porta ${PORT}`);
-  console.log(`📱 Acesse: http://localhost:${PORT}`);
+  console.log(`🚀 Stream+ ULTRA RÁPIDO rodando na porta ${PORT}`);
 });
 
 module.exports = app;
