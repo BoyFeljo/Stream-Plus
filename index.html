@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Playmoz - Filmes, Séries e Animes</title>
+  <meta name="description" content="Playmoz é uma plataforma digital criada por Boy Feljo 🇲🇿, dedicada a oferecer uma vasta seleção de filmes, séries e animes para todos os públicos.">
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://play-moz.lovestoblog.com/" />
+  <meta name="theme-color" content="#E50914">
+  <link rel="icon" type="image/png" href="/icons/icon-512.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --netflix-red: #e50914;
+      --netflix-dark: #141414;
+      --netflix-darker: #0a0a0a;
+      --netflix-light: #f5f5f1;
+      --netflix-gray: #808080;
+      --netflix-card-bg: #181818;
+      --header-height: 68px;
+      --bottom-nav-height: 60px;
+      --banner-height: 50px;
+      --card-radius: 8px;
+      --transition: all 0.3s ease;
+      --shadow: 0 8px 16px rgba(0,0,0,0.5);
+      --hover-scale: 1.05;
+      --hover-translate: -5px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', 'Arial', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--netflix-dark);
+      color: var(--netflix-light);
+      overflow-x: hidden;
+      min-height: 100vh;
+      padding-bottom: calc(var(--bottom-nav-height) + var(--banner-height));
+      font-size: 16px;
+    }
+
+    /* Netflix-like Header */
+    header {
+      padding: 0 4%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, transparent 90%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: var(--header-height);
+      transition: var(--transition);
+    }
+
+    .logo {
+      color: var(--netflix-red);
+      font-size: 2.2rem;
+      font-weight: 900;
+      text-decoration: none;
+      letter-spacing: -1px;
+      text-shadow: var(--shadow);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .search-btn, .menu-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .search-btn:hover, .menu-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Netflix Hero Section */
+    .hero {
+      height: 85vh;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      margin-top: var(--header-height);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, var(--netflix-dark) 0%, transparent 40%);
+    }
+
+    .hero-content {
+      padding: 4%;
+      z-index: 1;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      font-weight: 900;
+      text-shadow: var(--shadow);
+      line-height: 1.1;
+    }
+
+    .hero-desc {
+      font-size: 1.2rem;
+      margin-bottom: 25px;
+      max-width: 600px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      line-height: 1.5;
+      color: #e6e6e6;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .hero-btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.1rem;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-play {
+      background: var(--netflix-red);
+      color: white;
+    }
+
+    .btn-play:hover {
+      background: #f40612;
+      transform: scale(1.05);
+    }
+
+    .btn-info {
+      background: rgba(109, 109, 110, 0.7);
+      color: white;
+    }
+
+    .btn-info:hover {
+      background: rgba(109, 109, 110, 0.9);
+      transform: scale(1.05);
+    }
+
+    /* Netflix Categories */
+    .categories {
+      padding: 30px 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      margin: 0 4% 20px;
+      font-weight: 700;
+    }
+
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding: 0 4% 20px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+
+    .carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .item {
+      min-width: 220px;
+      width: 220px;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      transition: var(--transition);
+      background: var(--netflix-card-bg);
+      box-shadow: var(--shadow);
+      transform-origin: center left;
+    }
+
+    .item:hover {
+      transform: scale(var(--hover-scale)) translateY(var(--hover-translate));
+      z-index: 2;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .item-poster {
+      width: 100%;
+      height: 330px;
+      object-fit: cover;
+      display: block;
+      transition: var(--transition);
+    }
+
+    .item:hover .item-poster {
+      transform: scale(1.05);
+    }
+
+    .item-title {
+      padding: 15px 10px;
+      font-weight: 500;
+      text-align: center;
+      background: var(--netflix-card-bg);
+      transition: var(--transition);
+    }
+
+    .item:hover .item-title {
+      opacity: 0;
+    }
+
+    /* Player Modal Netflix-style */
+    .player-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 3000;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .player-modal-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .player-modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      z-index: 2;
+      background: rgba(0,0,0,0.7);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .player-modal-close:hover {
+      background: rgba(255,255,255,0.2);
+      transform: rotate(90deg);
+    }
+
+    .player-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-player {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: #000;
+    }
+
+    /* Download Banner */
+    .download-banner {
+      position: fixed;
+      bottom: calc(var(--bottom-nav-height) + var(--banner-height));
+      left: 0;
+      right: 0;
+      background: linear-gradient(to right, #e50914, #b81d24);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      z-index: 997;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+    }
+
+    .download-text {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .download-btn {
+      background: white;
+      color: var(--netflix-red);
+      border: none;
+      border-radius: 4px;
+      padding: 10px 25px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 20px;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+    }
+
+    .download-btn:hover {
+      background: #f5f5f1;
+      transform: scale(1.05);
+    }
+
+    .close-download {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      margin-left: 20px;
+      transition: var(--transition);
+    }
+
+    .close-download:hover {
+      transform: scale(1.2);
+    }
+
+    /* Netflix Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--bottom-nav-height);
+      background: var(--netflix-darker);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 999;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--netflix-gray);
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: var(--transition);
+      padding: 8px 0;
+      width: 20%;
+    }
+
+    .nav-item i {
+      font-size: 1.4rem;
+      margin-bottom: 5px;
+      transition: var(--transition);
+    }
+
+    .nav-item.active, .nav-item:hover {
+      color: white;
+    }
+
+    .nav-item.active i {
+      color: var(--netflix-red);
+    }
+
+    /* Netflix Search Page */
+    .search-page {
+      padding: 90px 4% 30px;
+    }
+
+    .search-header {
+      margin-bottom: 30px;
+      padding: 0 10px;
+    }
+
+    .search-header h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      font-size: 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .search-input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .search-input::placeholder {
+      color: #b3b3b3;
+    }
+
+    /* Netflix Grid View */
+    .grid-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+      padding: 0 10px;
+    }
+
+    .grid-item {
+      background: var(--netflix-card-bg);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      position: relative;
+      transform-origin: center center;
+    }
+
+    .grid-item:hover {
+      transform: scale(var(--hover-scale)) translateY(var(--hover-translate));
+      z-index: 2;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .grid-poster {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+      transition: var(--transition);
+    }
+
+    .grid-item:hover .grid-poster {
+      transform: scale(1.05);
+    }
+
+    .grid-title {
+      padding: 15px 10px;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      background: var(--netflix-card-bg);
+      transition: var(--transition);
+    }
+
+    .grid-item:hover .grid-title {
+      opacity: 0;
+    }
+
+    /* Netflix Error Page */
+    .error-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+      background: var(--netflix-dark);
+    }
+
+    .error-code {
+      font-size: 10rem;
+      font-weight: 900;
+      color: var(--netflix-red);
+      margin-bottom: 30px;
+      text-shadow: var(--shadow);
+    }
+
+    .error-message {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    .error-description {
+      color: var(--netflix-gray);
+      margin-bottom: 40px;
+      max-width: 600px;
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+
+    .error-btn {
+      padding: 15px 40px;
+      background: var(--netflix-red);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .error-btn:hover {
+      background: #f40612;
+      transform: scale(1.05);
+    }
+
+    /* Loading Spinner */
+    .loading {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--netflix-red);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Player Loading */
+    .player-loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 1.5rem;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Author Page */
+    .author-page {
+      padding: 90px 4% 30px;
+    }
+
+    .author-header {
+      margin-bottom: 30px;
+      padding: 0 10px;
+    }
+
+    .author-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .author-details {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .author-bio {
+      display: flex;
+      gap: 30px;
+    }
+
+    .author-photo {
+      flex: 0 0 300px;
+    }
+
+    .author-photo img {
+      width: 100%;
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow);
+    }
+
+    .author-info {
+      flex: 1;
+    }
+
+    .author-info h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .author-info p {
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      color: #d2d2d2;
+    }
+
+    .author-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .author-meta p {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .author-meta strong {
+      color: var(--netflix-red);
+    }
+
+    /* Details Page */
+    .details-page {
+      padding: 90px 4% 30px;
+    }
+
+    .details-header {
+      position: relative;
+      height: 60vh;
+      background-size: cover;
+      background-position: center;
+      margin-bottom: 30px;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+    }
+
+    .details-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, var(--netflix-dark) 0%, transparent 60%);
+    }
+
+    .details-body {
+      padding: 0 4%;
+    }
+
+    .details-title {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      font-weight: 900;
+    }
+
+    .details-meta {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      color: #46d369;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .details-overview {
+      margin-bottom: 25px;
+      line-height: 1.6;
+      color: #d2d2d2;
+      font-size: 1.1rem;
+      max-width: 800px;
+    }
+
+    .details-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .details-section-title {
+      font-size: 1.8rem;
+      margin: 30px 0 20px;
+      font-weight: 700;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 1200px) {
+      .hero-title {
+        font-size: 3rem;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      .hero-desc {
+        font-size: 1.1rem;
+      }
+      .item {
+        min-width: 180px;
+        width: 180px;
+      }
+      .item-poster {
+        height: 270px;
+      }
+      :root {
+        --hover-scale: 1.08;
+        --hover-translate: -8px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        height: 60vh;
+      }
+      .hero-title {
+        font-size: 2rem;
+      }
+      .hero-desc {
+        font-size: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .hero-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+      }
+      .section-title {
+        font-size: 1.4rem;
+      }
+      .details-title {
+        font-size: 2rem;
+      }
+      .details-meta {
+        font-size: 1rem;
+      }
+      .details-overview {
+        font-size: 1rem;
+      }
+      .item {
+        min-width: 150px;
+        width: 150px;
+      }
+      .item-poster {
+        height: 225px;
+      }
+      .grid-view {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+      }
+      .grid-poster {
+        height: 210px;
+      }
+      :root {
+        --hover-scale: 1.05;
+        --hover-translate: -5px;
+      }
+      .author-bio {
+        flex-direction: column;
+      }
+      .author-photo {
+        flex: 0 0 auto;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .hero {
+        height: 50vh;
+      }
+      .hero-actions {
+        flex-wrap: wrap;
+      }
+      .section-title {
+        font-size: 1.3rem;
+      }
+      .item {
+        min-width: 130px;
+        width: 130px;
+      }
+      .item-poster {
+        height: 195px;
+      }
+      .details-title {
+        font-size: 1.7rem;
+      }
+      .details-buttons {
+        flex-wrap: wrap;
+      }
+      .grid-view {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+      }
+      .grid-poster {
+        height: 180px;
+      }
+      .download-text {
+        font-size: 0.9rem;
+      }
+      .download-btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+      :root {
+        --hover-scale: 1.03;
+        --hover-translate: -3px;
+      }
+    }
+    
+    /* Desktop specific styles */
+    @media (min-width: 992px) {
+      .categories {
+        padding: 50px 0;
+      }
+      
+      .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+      }
+      
+      .carousel {
+        gap: 20px;
+      }
+      
+      .item {
+        min-width: 250px;
+        width: 250px;
+      }
+      
+      .item-poster {
+        height: 375px;
+      }
+      
+      .grid-view {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 25px;
+      }
+      
+      .grid-poster {
+        height: 300px;
+      }
+      
+      .hero-content {
+        max-width: 800px;
+      }
+      
+      .hero-title {
+        font-size: 4rem;
+      }
+      
+      .hero-desc {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Netflix-style -->
+  <header id="main-header">
+    <a href="/" class="logo">PLAYMOZ</a>
+    <div class="header-right">
+      <button class="search-btn" id="search-btn">
+        <i class="fas fa-search"></i>
+      </button>
+      <button class="menu-btn" id="menu-btn">
+        <i class="fas fa-user"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section Netflix-style -->
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <h1 class="hero-title" id="hero-title">Carregando...</h1>
+      <p class="hero-desc" id="hero-desc"></p>
+      <div class="hero-actions">
+        <button class="hero-btn btn-play" id="hero-play">
+          <i class="fas fa-play"></i> Reproduzir
+        </button>
+        <button class="hero-btn btn-info" id="hero-info">
+          <i class="fas fa-info-circle"></i> Mais Informações
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Netflix-style -->
+  <section class="categories">
+    <div id="categories-container">
+      <!-- Categorias serão inseridas aqui via JavaScript -->
+    </div>
+  </section>
+
+  <!-- Download Banner -->
+  <div class="download-banner" id="download-banner">
+    <div class="download-text">
+      Baixe nosso aplicativo completo com opção de download e muito mais!
+    </div>
+    <button class="download-btn" id="download-btn">Baixar Agora</button>
+    <button class="close-download" id="close-download">&times;</button>
+  </div>
+
+  <!-- Player Modal Netflix-style -->
+  <div class="player-modal" id="player-modal">
+    <div class="player-modal-content">
+      <div class="player-modal-close" id="player-modal-close">
+        <i class="fas fa-times"></i>
+      </div>
+      
+      <div class="player-container">
+        <div class="player-loading" id="player-loading">
+          <div class="spinner"></div>
+          <p>Carregando player...</p>
+        </div>
+        <iframe class="video-player" id="video-player" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Netflix-style -->
+  <div class="bottom-nav">
+    <a href="/" class="nav-item active">
+      <i class="fas fa-home"></i>
+      <span>Início</span>
+    </a>
+    <a href="/movies" class="nav-item">
+      <i class="fas fa-film"></i>
+      <span>Filmes</span>
+    </a>
+    <a href="/tv" class="nav-item">
+      <i class="fas fa-tv"></i>
+      <span>Séries</span>
+    </a>
+    <a href="/anime" class="nav-item">
+      <i class="fas fa-dragon"></i>
+      <span>Animes</span>
+    </a>
+    <a href="/favorites" class="nav-item">
+      <i class="fas fa-heart"></i>
+      <span>Favoritos</span>
+    </a>
+  </div>
+
+  <script>
+    // Configurações
+    const APP_DOWNLOAD_LINK = 'https://baixarflixmoz.netlify.app/';
+    const API_BASE_URL = '/api'; // Proxy para API do TMDB
+    
+    // Elementos DOM
+    const heroSection = document.getElementById('hero');
+    const heroTitle = document.getElementById('hero-title');
+    const heroDesc = document.getElementById('hero-desc');
+    const heroPlayBtn = document.getElementById('hero-play');
+    const heroInfoBtn = document.getElementById('hero-info');
+    const categoriesContainer = document.getElementById('categories-container');
+    const playerModal = document.getElementById('player-modal');
+    const playerModalClose = document.getElementById('player-modal-close');
+    const playerLoading = document.getElementById('player-loading');
+    const videoPlayer = document.getElementById('video-player');
+    const searchBtn = document.getElementById('search-btn');
+    const downloadBanner = document.getElementById('download-banner');
+    const closeDownloadBtn = document.getElementById('close-download');
+    const downloadBtn = document.getElementById('download-btn');
+    
+    // Estado da aplicação
+    let currentMedia = {};
+    
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      // Event listeners para navegação
+      searchBtn.addEventListener('click', () => {
+        window.location.href = '/search';
+      });
+      
+      // Banner de download
+      closeDownloadBtn.addEventListener('click', () => {
+        downloadBanner.style.display = 'none';
+      });
+      
+      downloadBtn.addEventListener('click', () => {
+        window.open(APP_DOWNLOAD_LINK, '_blank');
+        downloadBanner.style.display = 'none';
+      });
+      
+      // Carregar conteúdo inicial
+      loadHeroBanner();
+      loadCategories();
+      
+      setupEventListeners();
+    });
+    
+    // Configurar event listeners
+    function setupEventListeners() {
+      // Player modal
+      playerModalClose.addEventListener('click', closePlayerModal);
+      
+      // Botões no hero
+      heroPlayBtn.addEventListener('click', () => {
+        if (currentMedia.id) openPlayer(currentMedia.id, currentMedia.media_type || 'movie');
+      });
+      heroInfoBtn.addEventListener('click', () => {
+        if (currentMedia.id) openDetailsPage(currentMedia.id, currentMedia.media_type || 'movie');
+      });
+    }
+    
+    // Carregar banner principal
+    async function loadHeroBanner() {
+      try {
+        const url = `${API_BASE_URL}/trending`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error('Erro no banner:', data.error);
+          return;
+        }
+        
+        // Escolher um item aleatório
+        const randomIndex = Math.floor(Math.random() * data.results.length);
+        const media = data.results[randomIndex];
+        currentMedia = media;
+        
+        // Atualizar UI
+        heroTitle.textContent = media.title || media.name;
+        
+        // Descrição limitada a 150 caracteres
+        let overview = media.overview || '';
+        if (overview.length > 150) {
+          overview = overview.substring(0, 150) + '...';
+        }
+        heroDesc.textContent = overview;
+        
+        // Definir imagem de fundo
+        const backdropUrl = media.backdrop_path 
+          ? `https://image.tmdb.org/t/p/original${media.backdrop_path}`
+          : 'https://via.placeholder.com/1920x1080?text=PlayMoz';
+        
+        heroSection.style.backgroundImage = `url(${backdropUrl})`;
+        
+      } catch (error) {
+        console.error('Erro ao carregar banner:', error);
+      }
+    }
+    
+    // Carregar categorias
+    async function loadCategories() {
+      categoriesContainer.innerHTML = '';
+      
+      // Categorias pré-definidas
+      const categories = [
+        { id: 'popular', title: 'Populares', url: `${API_BASE_URL}/trending` },
+        { id: 'top_rated_movies', title: 'Filmes Mais Votados', url: `${API_BASE_URL}/movies/popular` },
+        { id: 'top_rated_tv', title: 'Séries Mais Votadas', url: `${API_BASE_URL}/tv/popular` },
+        { id: 'anime', title: 'Animes', url: `${API_BASE_URL}/anime` }
+      ];
+      
+      // Carregar cada categoria
+      for (const category of categories) {
+        try {
+          const response = await fetch(category.url);
+          const data = await response.json();
+          
+          if (data.error) {
+            console.error(`Erro na categoria ${category.title}:`, data.error);
+            continue;
+          }
+          
+          // Criar seção da categoria
+          const categoryHTML = `
+            <div class="category">
+              <h2 class="section-title">${category.title}</h2>
+              <div class="carousel" id="${category.id}">
+                ${data.results.slice(0, 10).map(item => createMediaItem(item)).join('')}
+              </div>
+            </div>
+          `;
+          
+          categoriesContainer.innerHTML += categoryHTML;
+        } catch (error) {
+          console.error(`Erro ao carregar categoria ${category.title}:`, error);
+        }
+      }
+      
+      // Adicionar event listeners aos itens
+      document.querySelectorAll('.item').forEach(item => {
+        item.addEventListener('click', () => {
+          const mediaId = item.dataset.id;
+          const mediaType = item.dataset.type;
+          openDetailsPage(mediaId, mediaType);
+        });
+      });
+    }
+    
+    // Abrir página de detalhes
+    function openDetailsPage(id, type) {
+      window.location.href = `/details?id=${id}&type=${type}`;
+    }
+    
+    // Abrir player (protegido)
+    async function openPlayer(id, type) {
+      try {
+        // Mostrar loading no player
+        playerLoading.style.display = 'flex';
+        videoPlayer.style.display = 'none';
+        playerModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        const response = await fetch(`${API_BASE_URL}/player?id=${id}&type=${type}`);
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error('Erro ao obter URL do player:', data.error);
+          alert('Erro ao carregar o player. Tente novamente.');
+          playerLoading.style.display = 'none';
+          return;
+        }
+        
+        // Esconder loading e mostrar player
+        videoPlayer.src = data.url;
+        videoPlayer.style.display = 'block';
+        playerLoading.style.display = 'none';
+        
+        // Evento para quando o vídeo começar a tocar
+        videoPlayer.addEventListener('loadeddata', () => {
+          playerLoading.style.display = 'none';
+        });
+        
+      } catch (error) {
+        console.error('Erro ao abrir player:', error);
+        alert('Erro ao abrir o player.');
+        playerLoading.style.display = 'none';
+        closePlayerModal();
+      }
+    }
+    
+    // Criar item de mídia para carrossel
+    function createMediaItem(item) {
+      const title = item.title || item.name;
+      let mediaType = item.media_type;
+      
+      if (!mediaType) {
+        mediaType = item.title ? 'movie' : 'tv';
+      }
+      
+      const posterUrl = item.poster_path 
+        ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+        : 'https://via.placeholder.com/500x750?text=Sem+Imagem';
+      
+      return `
+        <div class="item" data-id="${item.id}" data-type="${mediaType}">
+          <img src="${posterUrl}" alt="${title}" class="item-poster" loading="lazy">
+        </div>
+      `;
+    }
+    
+    // Fechar modal do player
+    function closePlayerModal() {
+      playerModal.style.display = 'none';
+      videoPlayer.src = '';
+      document.body.style.overflow = 'auto';
+    }
+  </script>
+</body>
+</html>
