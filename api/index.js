@@ -1,12 +1,9 @@
-// index.js — versão GitHub + Vercel ⚡ by Boy Feljo 🇲🇿
-
+// api/index.js ⚡ by Boy Feljo 🇲🇿
 const m3u_url = "http://turbo.gftv.in:80/get.php?username=189956566&password=823971614&type=m3u_plus";
 
-// Cache global (memória da instância — dura até 6 horas)
 let cache = { timestamp: 0, data: null };
-const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 horas
+const CACHE_TTL = 6 * 60 * 60 * 1000;
 
-// Função de parsing rápida
 function parseM3UChannels(m3uContent) {
   const lines = m3uContent.split(/\r?\n/);
   const channels = [];
@@ -25,7 +22,6 @@ function parseM3UChannels(m3uContent) {
     }
   }
 
-  // Remove duplicados
   const seen = new Set();
   return channels.filter(c => {
     if (!c.url || seen.has(c.url)) return false;
@@ -34,12 +30,10 @@ function parseM3UChannels(m3uContent) {
   });
 }
 
-// 🧠 Função principal — handler Vercel
 export default async function handler(req, res) {
   try {
     const now = Date.now();
 
-    // CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -47,16 +41,13 @@ export default async function handler(req, res) {
 
     const q = req.query.q ? req.query.q.toLowerCase() : null;
 
-    // ⚡ Usa cache se ainda válido
     if (cache.data && now - cache.timestamp < CACHE_TTL) {
-      console.log("✅ Cache ativo");
       const filtered = q
         ? cache.data.filter(c => c.name.toLowerCase().includes(q))
         : cache.data;
       return res.status(200).json(filtered);
     }
 
-    console.log("⏳ Atualizando cache...");
     const response = await fetch(m3u_url, { cache: "no-store" });
     const text = await response.text();
 
@@ -65,23 +56,7 @@ export default async function handler(req, res) {
     }
 
     const channels = parseM3UChannels(text);
-
-    // 🧩 Atualiza cache em memória
     cache = { timestamp: now, data: channels };
-
-    // 💡 Opcional: gerar JSON público
-    // Pode exportar via GitHub Actions para servir direto como arquivo
-    // await fetch('https://api.github.com/repos/teu-usuario/teu-repo/contents/public/cache.json', {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     message: 'Atualiza cache IPTV',
-    //     content: Buffer.from(JSON.stringify(channels, null, 2)).toString('base64'),
-    //   }),
-    // });
 
     const filtered = q
       ? channels.filter(c => c.name.toLowerCase().includes(q))
@@ -94,4 +69,4 @@ export default async function handler(req, res) {
       details: err.message,
     });
   }
-          }
+}
