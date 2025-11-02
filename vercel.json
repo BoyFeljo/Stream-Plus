@@ -1,28 +1,34 @@
 {
   "version": 2,
-  "name": "stream-lite",
+  "name": "stream-plus-five",
   "builds": [
     {
-      "src": "index.html",
+      "src": "*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "sitemap.xml",
+      "src": "*.xml",
       "use": "@vercel/static"
     },
     {
-      "src": "robots.txt",
+      "src": "*.txt",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/sitemap.xml",
-      "dest": "/sitemap.xml"
+      "dest": "/sitemap.xml",
+      "headers": {
+        "Content-Type": "application/xml"
+      }
     },
     {
       "src": "/robots.txt",
-      "dest": "/robots.txt"
+      "dest": "/robots.txt",
+      "headers": {
+        "Content-Type": "text/plain"
+      }
     },
     {
       "src": "/(.*)",
