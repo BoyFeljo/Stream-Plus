@@ -1,5 +1,10 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /private/
 
+# Sitemap
 Sitemap: https://stream-plus-five.vercel.app/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 10
