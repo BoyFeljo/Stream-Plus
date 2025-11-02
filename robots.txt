@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
 
 Sitemap: https://stream-lite.netlify.app/sitemap.xml
