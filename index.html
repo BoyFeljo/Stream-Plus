@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Stream+ Lite</title>
-    <meta name="google-site-verification" content="9Uadv6YZZwCJvB8tL36ZwX4SSQzkNI_X50iudPs9diQ" />
-    <meta name="description" content="Stream+ Lite / Stream++ – Filmes, Séries e Animes em HD! Leve o entretenimento com você! Com Stream+ Lite, você assiste e baixa seus filmes, séries e animes favoritos em alta qualidade, tudo de forma rápida e prática, sem ocupar muito espaço no seu celular." />
-    <meta name="keywords" content="stream Lite, filmes grátis, séries online, animes grátis, assistir filmes, download filmes, aplicativo filmes" />
+    <title>Stream+ Lite - Baixar Aplicativo</title>
+    <meta name="description" content="Baixe o Stream+ Lite - O melhor aplicativo para assistir filmes, séries e animes gratuitamente em HD. Downloads offline e interface otimizada para celular." />
+    <meta name="google-adsense-account" content="ca-pub-8114248576598218">
+    <meta name="keywords" content="stream Lite, baixar app filmes, aplicativo séries grátis, download stream lite, filmes offline" />
     <meta name="author" content="Boy Feljo" />
     <meta name="robots" content="index, follow" />
     
@@ -25,33 +25,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
     <!-- Open Graph (Facebook, WhatsApp) -->
-    <meta property="og:title" content="Stream+ Lite - Filmes, Séries e Animes Online" />
-    <meta property="og:description" content="Stream+ Lite é o aplicativo definitivo para quem ama filmes, séries, desenhos animados e animes. Totalmente grátis, com uma vasta coleção de conteúdos para todos os gostos." />
+    <meta property="og:title" content="Stream+ Lite - Baixar Aplicativo" />
+    <meta property="og:description" content="Baixe o Stream+ Lite - O melhor aplicativo para assistir filmes, séries e animes gratuitamente em HD. Downloads offline e interface otimizada para celular." />
     <meta property="og:image" content="https://i.postimg.cc/zGVzG91D/file-000000004cc061fd9cae9e7e6d5e8a87.png" />
     <meta property="og:url" content="https://stream-plus-five.vercel.app/" />
     <meta property="og:type" content="website" />
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Stream+ Lite - Filmes, Séries e Animes Online" />
-    <meta name="twitter:description" content="Stream+ Lite oferece streaming e download gratuito de filmes, séries e animes. Tudo em um único app." />
+    <meta name="twitter:title" content="Stream+ Lite - Baixar Aplicativo" />
+    <meta name="twitter:description" content="Baixe o Stream+ Lite - O melhor aplicativo para assistir filmes, séries e animes gratuitamente em HD." />
     <meta name="twitter:image" content="https://i.postimg.cc/zGVzG91D/file-000000004cc061fd9cae9e7e6d5e8a87.png" />
-    <link rel="sitemap" type="application/xml" href="https://stream-lite.netlify.app/sitemap.xml">
+    
     <style>
         :root {
-            --primary: #ff3366;
-            --primary-dark: #e62e5c;
+            --primary: #e50914;
+            --primary-dark: #b81d24;
             --secondary: #6c63ff;
             --accent: #00d4ff;
-            --dark: #0f0f1b;
-            --dark-light: #1a1a2e;
-            --darker: #050510;
+            --dark: #141414;
+            --dark-light: #181818;
+            --darker: #0a0a0a;
             --light: #ffffff;
             --gray: #b0b0c0;
-            --card-bg: #1e1e30;
+            --card-bg: #181818;
             --text-primary: #ffffff;
             --text-secondary: #b0b0c0;
-            --gradient: linear-gradient(135deg, #ff3366 0%, #6c63ff 100%);
+            --gradient: linear-gradient(135deg, #e50914 0%, #b81d24 100%);
             --gradient-secondary: linear-gradient(135deg, #00d4ff 0%, #6c63ff 100%);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -104,8 +104,8 @@
 
         /* Header Moderno */
         header {
-            background: rgba(15, 15, 27, 0.95);
-            padding: 1.2rem 2rem;
+            background: rgba(20, 20, 20, 0.95);
+            padding: 1rem 1.5rem;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -124,14 +124,14 @@
         }
 
         .logo img {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
         }
 
         .logo h1 {
-            font-size: 1.7rem;
+            font-size: 1.5rem;
             color: var(--light);
             font-weight: 800;
             background: var(--gradient);
@@ -142,7 +142,7 @@
 
         /* Menu Hamburguer Moderno */
         .menu-toggle {
-            display: none;
+            display: block;
             width: 30px;
             height: 22px;
             position: relative;
@@ -188,18 +188,37 @@
         }
 
         /* Navegação Moderna */
+        nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 280px;
+            height: 100vh;
+            background: var(--dark-light);
+            padding: 5rem 2rem;
+            transition: right 0.4s ease;
+            z-index: 1000;
+            box-shadow: -8px 0 20px rgba(0,0,0,0.4);
+        }
+        
+        nav.active {
+            right: 0;
+        }
+        
         nav ul {
             list-style: none;
             display: flex;
-            gap: 2rem;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
         nav ul li a {
             font-weight: 500;
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: var(--light);
             position: relative;
             padding: 0.5rem 0;
+            display: block;
         }
 
         nav ul li a:hover {
@@ -224,25 +243,25 @@
         /* Conteúdo Principal */
         main {
             flex-grow: 1;
-            max-width: 1400px;
+            width: 100%;
             margin: 0 auto;
-            padding: 2rem 1.5rem;
+            padding: 1.5rem;
         }
 
         /* Seções Modernas */
         .section {
-            margin-bottom: 6rem;
+            margin-bottom: 4rem;
         }
 
         .section-header {
-            margin-bottom: 3.5rem;
+            margin-bottom: 2.5rem;
             text-align: center;
         }
 
         .section-header h2 {
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             color: var(--light);
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             position: relative;
             display: inline-block;
         }
@@ -263,18 +282,18 @@
             color: var(--text-secondary);
             max-width: 750px;
             margin: 0 auto;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         /* Hero Moderno */
         .hero {
-            padding: 8rem 0;
+            padding: 4rem 0;
             text-align: center;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(15,15,27,0.95) 0%, rgba(108,99,255,0.15) 100%);
-            border-radius: 25px;
-            margin-bottom: 5rem;
+            background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(108,99,255,0.15) 100%);
+            border-radius: 20px;
+            margin-bottom: 3rem;
         }
 
         .hero::before {
@@ -290,8 +309,8 @@
         }
 
         .hero h1 {
-            font-size: 4rem;
-            margin-bottom: 1.8rem;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
             line-height: 1.2;
             background: linear-gradient(135deg, #ffffff 0%, #ff99aa 100%);
             -webkit-background-clip: text;
@@ -301,10 +320,10 @@
         }
 
         .hero p {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             color: var(--text-secondary);
             max-width: 750px;
-            margin: 0 auto 3rem auto;
+            margin: 0 auto 2.5rem auto;
         }
 
         /* Botões Modernos */
@@ -313,10 +332,10 @@
             align-items: center;
             justify-content: center;
             gap: 0.8rem;
-            padding: 1.2rem 2.5rem;
-            border-radius: 15px;
+            padding: 1.1rem 2.2rem;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: var(--transition);
             text-decoration: none;
@@ -324,6 +343,8 @@
             margin: 0.5rem;
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 300px;
         }
 
         .btn::before {
@@ -344,12 +365,12 @@
         .btn-primary {
             background: var(--gradient);
             color: var(--light);
-            box-shadow: 0 6px 20px rgba(255, 51, 102, 0.4);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(255, 51, 102, 0.5);
+            box-shadow: 0 12px 30px rgba(229, 9, 20, 0.5);
         }
 
         .btn-outline {
@@ -365,10 +386,17 @@
             transform: translateY(-5px);
         }
 
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
         /* Cards Modernos */
         .card {
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 15px;
             overflow: hidden;
             transition: var(--transition);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -376,14 +404,14 @@
         }
 
         .card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(255, 51, 102, 0.25);
-            border-color: rgba(255, 51, 102, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(229, 9, 20, 0.25);
+            border-color: rgba(229, 9, 20, 0.3);
         }
 
         .card-img {
             width: 100%;
-            height: 220px;
+            height: 200px;
             object-fit: cover;
             transition: transform 0.5s ease;
         }
@@ -393,33 +421,33 @@
         }
 
         .card-body {
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .card-title {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
             color: var(--light);
         }
 
         .card-text {
             color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
         }
 
         /* Grid de Recursos */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-            margin-top: 2.5rem;
+            grid-template-columns: 1fr;
+            gap: 1.8rem;
+            margin-top: 2rem;
         }
 
         .feature-card {
             background: var(--card-bg);
-            padding: 3rem 2rem;
-            border-radius: 20px;
+            padding: 2.5rem 1.5rem;
+            border-radius: 15px;
             text-align: center;
             transition: var(--transition);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -439,14 +467,14 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(108, 99, 255, 0.25);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(108, 99, 255, 0.25);
         }
 
         .feature-icon {
-            font-size: 3.5rem;
+            font-size: 3rem;
             color: var(--primary);
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.5rem;
             background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -454,30 +482,30 @@
         }
 
         .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1.2rem;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
             color: var(--light);
         }
 
         .feature-card p {
             color: var(--text-secondary);
-            font-size: 1.05rem;
-            line-height: 1.7;
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
         /* Galeria Moderna */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.8rem;
-            margin-top: 2.5rem;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .gallery-item {
-            border-radius: 15px;
+            border-radius: 12px;
             overflow: hidden;
             position: relative;
-            height: 300px;
+            height: 250px;
             box-shadow: var(--shadow);
         }
 
@@ -497,8 +525,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(15,15,27,0.95) 0%, transparent 100%);
-            padding: 2.5rem 1.8rem 1.8rem 1.8rem;
+            background: linear-gradient(to top, rgba(20,20,20,0.95) 0%, transparent 100%);
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
             opacity: 0;
             transition: opacity 0.4s ease;
         }
@@ -508,23 +536,23 @@
         }
 
         .gallery-overlay h3 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: var(--light);
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.5rem;
         }
 
         /* Depoimentos Modernos */
         .testimonials-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2.5rem;
-            margin-top: 2.5rem;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .testimonial-card {
             background: var(--card-bg);
-            padding: 3rem;
-            border-radius: 20px;
+            padding: 2.5rem;
+            border-radius: 15px;
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: var(--shadow);
@@ -533,9 +561,9 @@
         .testimonial-card::before {
             content: '"';
             position: absolute;
-            top: 1.2rem;
-            left: 2rem;
-            font-size: 6rem;
+            top: 1rem;
+            left: 1.5rem;
+            font-size: 5rem;
             color: var(--primary);
             opacity: 0.1;
             font-family: serif;
@@ -544,52 +572,52 @@
 
         .testimonial-text {
             font-style: italic;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             color: var(--text-secondary);
             position: relative;
             z-index: 1;
-            font-size: 1.1rem;
-            line-height: 1.7;
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
         .testimonial-author {
             display: flex;
             align-items: center;
-            gap: 1.2rem;
+            gap: 1rem;
         }
 
         .author-avatar {
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--primary);
-            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
         }
 
         .author-info h4 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--light);
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
         }
 
         .author-info p {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
         }
 
         /* Contato Moderno */
         .contact-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-            margin-top: 2.5rem;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .contact-card {
             background: var(--card-bg);
-            padding: 3rem;
-            border-radius: 20px;
+            padding: 2.5rem;
+            border-radius: 15px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: var(--shadow);
@@ -609,14 +637,14 @@
         }
 
         .contact-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.25);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.25);
         }
 
         .contact-icon {
-            font-size: 3rem;
+            font-size: 2.8rem;
             color: var(--accent);
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.5rem;
             background: var(--gradient-secondary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -624,15 +652,15 @@
         }
 
         .contact-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1.2rem;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
             color: var(--light);
         }
 
         .contact-card p, .contact-card a {
             color: var(--text-secondary);
-            font-size: 1.05rem;
-            margin-bottom: 0.6rem;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
             display: block;
         }
 
@@ -643,35 +671,35 @@
         /* Footer Moderno */
         footer {
             background: var(--darker);
-            padding: 5rem 1.5rem 2.5rem;
+            padding: 4rem 1.5rem 2rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 5rem;
+            margin-top: 3rem;
         }
 
         .footer-container {
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 3.5rem;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
         }
 
         .footer-logo {
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.5rem;
         }
 
         .footer-logo img {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3);
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
         }
 
         .footer-logo h2 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             color: var(--light);
             background: var(--gradient);
             -webkit-background-clip: text;
@@ -681,17 +709,17 @@
 
         .footer-about p {
             color: var(--text-secondary);
-            font-size: 1.05rem;
-            margin-bottom: 1.8rem;
-            line-height: 1.7;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
         }
 
         .footer-links h3 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: var(--light);
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.5rem;
             position: relative;
-            padding-bottom: 1rem;
+            padding-bottom: 0.8rem;
         }
 
         .footer-links h3::after {
@@ -710,32 +738,32 @@
         }
 
         .footer-links li {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .footer-links a {
             color: var(--text-secondary);
-            font-size: 1.05rem;
+            font-size: 1rem;
             transition: var(--transition);
         }
 
         .footer-links a:hover {
             color: var(--accent);
-            padding-left: 10px;
+            padding-left: 8px;
         }
 
         .social-links {
             display: flex;
-            gap: 1.2rem;
-            margin-top: 1.8rem;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .social-links a {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             background: var(--card-bg);
             color: var(--text-secondary);
@@ -746,17 +774,17 @@
         .social-links a:hover {
             background: var(--gradient);
             color: var(--light);
-            transform: translateY(-7px);
-            box-shadow: 0 10px 25px rgba(255, 51, 102, 0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.4);
         }
 
         .copyright {
             text-align: center;
-            margin-top: 5rem;
-            padding-top: 2.5rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         /* Animações */
@@ -816,101 +844,132 @@
             }
         }
 
+        /* Download Banner */
+        .download-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--gradient);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            z-index: 997;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+        }
+
+        .download-text {
+            flex: 1;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .download-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            border-radius: 6px;
+            padding: 0.7rem 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            font-size: 0.9rem;
+        }
+
+        .download-btn:hover {
+            background: #f5f5f1;
+            transform: scale(1.05);
+        }
+
+        .close-download {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: var(--transition);
+        }
+
+        .close-download:hover {
+            transform: scale(1.2);
+        }
+
         /* Responsividade */
-        @media (max-width: 1200px) {
-            .hero h1 {
-                font-size: 3.5rem;
+        @media (min-width: 576px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
             
-            .section-header h2 {
-                font-size: 2.5rem;
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .btn {
+                width: auto;
+            }
+            
+            .btn-container {
+                flex-direction: row;
+                justify-content: center;
             }
         }
 
-        @media (max-width: 992px) {
+        @media (min-width: 768px) {
             .hero h1 {
                 font-size: 3rem;
             }
             
             .section-header h2 {
-                font-size: 2.3rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-            
-            nav {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 300px;
-                height: 100vh;
-                background: var(--dark-light);
-                padding: 7rem 2.5rem;
-                transition: right 0.4s ease;
-                z-index: 1000;
-                box-shadow: -8px 0 20px rgba(0,0,0,0.4);
-            }
-            
-            nav.active {
-                right: 0;
-            }
-            
-            nav ul {
-                flex-direction: column;
-                gap: 2rem;
-            }
-            
-            .hero {
-                padding: 5rem 0;
-            }
-            
-            .hero h1 {
-                font-size: 2.8rem;
-            }
-            
-            .hero p {
-                font-size: 1.2rem;
-            }
-            
-            .btn {
-                padding: 1.1rem 2.2rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            header {
-                padding: 1rem 1.2rem;
-            }
-            
-            .hero {
-                padding: 4rem 0;
-                border-radius: 15px;
-            }
-            
-            .hero h1 {
                 font-size: 2.5rem;
             }
             
-            .btn {
-                width: 100%;
-                margin: 0.5rem 0;
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
             
-            .section-header h2 {
-                font-size: 2.2rem;
+            .gallery-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
             
-            .section-header p {
-                font-size: 1.1rem;
+            .testimonials-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .contact-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
             
             .footer-container {
-                grid-template-columns: 1fr;
-                gap: 2.5rem;
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .hero {
+                padding: 6rem 0;
+            }
+            
+            .hero h1 {
+                font-size: 3.5rem;
             }
         }
     </style>
@@ -944,14 +1003,14 @@
         <section class="hero" id="home">
             <div class="particles" id="particles"></div>
             <div class="section fade-in">
-                <h1>Filmes, Séries e Animes em um só lugar</h1>
-                <p>Assista aos melhores conteúdos gratuitamente em qualquer dispositivo. Qualidade Full HD, downloads para assistir offline e atualizações constantes.</p>
-                <div style="display: flex; flex-wrap: wrap; justify-content: center; margin-top: 3rem;">
+                <h1>Baixe o Stream+ Lite Agora</h1>
+                <p>O melhor aplicativo para assistir filmes, séries e animes gratuitamente em HD. Downloads offline e interface otimizada para celular.</p>
+                <div class="btn-container">
                     <a href="https://www.mediafire.com/file/q7cul1zz1lhytd2/Stream++Lite.apk/file" class="btn btn-primary">
                         <i class="fas fa-download"></i> Baixar Aplicativo
                     </a>
-                    <a href="https://chat.whatsapp.com/CeElVmqNCZO59vgW0k8psb?mode=ems_copy_t" class="btn btn-outline" target="_blank">
-                        <i class="fas fa-globe"></i> Grupo de WhatsApp
+                    <a href="https://chat.whatsapp.com/CeElVmqNCZO59vgW0k8psb?mode=wwt" class="btn btn-outline" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Grupo WhatsApp
                     </a>
                 </div>
             </div>
@@ -1078,7 +1137,7 @@
                         <i class="fab fa-whatsapp"></i>
                     </div>
                     <h3>WhatsApp</h3>
-                    <a href="https://wa.me/258852931823" target="_blank">+258 85 293 1823</a>
+                    <a href="https://wa.me/258871966285" target="_blank">+258 87 196 6285</a>
                     <p>Suporte oficial</p>
                 </div>
                 <div class="contact-card fade-in delay-2">
@@ -1130,7 +1189,7 @@
                 <h3>Downloads</h3>
                 <ul>
                     <li><a href="https://www.mediafire.com/file/q7cul1zz1lhytd2/Stream++Lite.apk/file">Aplicativo Android</a></li>
-                    <li><a href="https://chat.whatsapp.com/CeElVmqNCZO59vgW0k8psb?mode=ems_copy_t" target="_blank">Canal no WhatsApp</a></li>
+                    <li><a href="https://chat.whatsapp.com/CeElVmqNCZO59vgW0k8psb?mode=wwt" target="_blank">Canal no WhatsApp</a></li>
                 </ul>
             </div>
         </div>
@@ -1138,6 +1197,15 @@
             <p>&copy; 2025 Stream+ Lite. Todos os direitos reservados. Desenvolvido por Boy Feljo</p>
         </div>
     </footer>
+
+    <!-- Download Banner -->
+    <div class="download-banner" id="download-banner">
+        <div class="download-text">
+            Baixe nosso aplicativo completo com opção de download e muito mais!
+        </div>
+        <button class="download-btn" id="download-btn">Baixar Agora</button>
+        <button class="close-download" id="close-download">&times;</button>
+    </div>
 
     <script>
         // Menu Hamburguer
@@ -1198,14 +1266,14 @@
         // Efeito de partículas
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
-            const particleCount = 20;
+            const particleCount = 15;
             
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.classList.add('particle');
                 
                 // Tamanho aleatório
-                const size = Math.random() * 20 + 5;
+                const size = Math.random() * 15 + 5;
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
                 
@@ -1214,7 +1282,7 @@
                 particle.style.top = `${Math.random() * 100}%`;
                 
                 // Cor aleatória
-                const colors = ['#ff3366', '#6c63ff', '#00d4ff'];
+                const colors = ['#e50914', '#6c63ff', '#00d4ff'];
                 const color = colors[Math.floor(Math.random() * colors.length)];
                 particle.style.background = color;
                 
@@ -1228,10 +1296,19 @@
         
         // Inicializar partículas
         createParticles();
+        
+        // Download Banner
+        const downloadBtn = document.getElementById('download-btn');
+        const closeDownloadBtn = document.getElementById('close-download');
+        const downloadBanner = document.getElementById('download-banner');
+        
+        downloadBtn.addEventListener('click', () => {
+            window.open('https://www.mediafire.com/file/q7cul1zz1lhytd2/Stream++Lite.apk/file', '_blank');
+        });
+        
+        closeDownloadBtn.addEventListener('click', () => {
+            downloadBanner.style.display = 'none';
+        });
     </script>
-    <script async="async" data-cfasync="false" src="//diarrhoeaeaglesunday.com/6b3fee134924f59e918697dfbbc16269/invoke.js"></script> <div id="container-6b3fee134924f59e918697dfbbc16269"></div>
-    <script type='text/javascript' src='//diarrhoeaeaglesunday.com/43/bc/49/43bc49da5ba5cf0b8121421f1fef9f99.js'></script>
-    <script type='text/javascript' src='//diarrhoeaeaglesunday.com/3e/b0/ee/3eb0eec18a324af65ba0ebfc2b695335.js'></script>
-    <script type="text/javascript"> 	atOptions = { 		'key' : 'fb48f32750ad3d5e5f9524fa8da7710d', 		'format' : 'iframe', 		'height' : 90, 		'width' : 728, 		'params' : {} 	}; </script> <script type="text/javascript" src="//diarrhoeaeaglesunday.com/fb48f32750ad3d5e5f9524fa8da7710d/invoke.js"></script>
-<script type="text/javascript"> 	atOptions = { 		'key' : '51981d816ddd2cd0d42d5d907555eb27', 		'format' : 'iframe', 		'height' : 300, 		'width' : 160, 		'params' : {} 	}; </script> <script type="text/javascript" src="//diarrhoeaeaglesunday.com/51981d816ddd2cd0d42d5d907555eb27/invoke.js"></script> <script type="text/javascript"> 	atOptions = { 		'key' : '6880902122696ae37d76c93e37946f3f', 		'format' : 'iframe', 		'height' : 600, 		'width' : 160, 		'params' : {} 	}; </script> <script type="text/javascript" src="//diarrhoeaeaglesunday.com/6880902122696ae37d76c93e37946f3f/invoke.js"></script> <script type="text/javascript"> 	atOptions = { 		'key' : '52d243b3bc1844f64d0ccc3f23dcf191', 		'format' : 'iframe', 		'height' : 90, 		'width' : 728, 		'params' : {} 	}; </script> <script type="text/javascript" src="//diarrhoeaeaglesunday.com/52d243b3bc1844f64d0ccc3f23dcf191/invoke.js"></script> <script type="text/javascript"> 	atOptions = { 		'key' : 'ddf26b0e246a2f77e813dc54aecfb080', 		'format' : 'iframe', 		'height' : 250, 		'width' : 300, 		'params' : {} 	}; </script> <script type="text/javascript" src="//diarrhoeaeaglesunday.com/ddf26b0e246a2f77e813dc54aecfb080/invoke.js"></script></body>
-</html>
+</body>
+    </html>
