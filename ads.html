@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site com Anúncios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .ads-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .ad-frame {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .ad-frame iframe {
+            width: 100%;
+            height: 250px;
+            border: none;
+        }
+
+        .ad-label {
+            background-color: #f8f9fa;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-bottom: 1px solid #ddd;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .ads-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Meu Site com Anúncios</h1>
+            <p>Exemplo de site com integração de iframes para anúncios</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <div class="main-content">
+                <h2>Conteúdo Principal</h2>
+                <p>Este é o conteúdo principal do site. Aqui você pode colocar artigos, produtos, ou qualquer outro conteúdo relevante.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            </div>
+
+            <div class="sidebar">
+                <h3>Barra Lateral</h3>
+                <p>Conteúdo adicional ou widgets podem ser colocados aqui.</p>
+            </div>
+        </div>
+
+        <!-- Container para os 4 iframes de anúncios -->
+        <div class="ads-container">
+            <div class="ad-frame">
+                <div class="ad-label">Anúncio 1</div>
+                <iframe src="https://diarrhoeaeaglesunday.com/a3capzaq2?key=9dccf625ac2c26f479e97c0486e10e10" title="Anúncio 1"></iframe>
+            </div>
+
+            <div class="ad-frame">
+                <div class="ad-label">Anúncio 2</div>
+                <iframe src="https://diarrhoeaeaglesunday.com/v1f7vfpnz?key=3a5c9046163f7d26e4122ae0c276734c" title="Anúncio 2"></iframe>
+            </div>
+
+            <div class="ad-frame">
+                <div class="ad-label">Anúncio 3</div>
+                <iframe src="https://diarrhoeaeaglesunday.com/vs1pmfwsk?key=6fe36a5ab605c531f67731b3bff35658" title="Anúncio 3"></iframe>
+            </div>
+
+            <div class="ad-frame">
+                <div class="ad-label">Anúncio 4</div>
+                <iframe src="https://diarrhoeaeaglesunday.com/c6ya52u4?key=7a0955cdca55b5e1bcf3466256b78009" title="Anúncio 4"></iframe>
+            </div>
+        </div>
+
+        <!-- Mais conteúdo abaixo dos anúncios -->
+        <div class="main-content">
+            <h2>Mais Conteúdo</h2>
+            <p>Conteúdo adicional abaixo dos anúncios para melhor experiência do usuário.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Meu Site. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+  
+</body>
+</html>
